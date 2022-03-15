@@ -22,13 +22,7 @@ public class NewContactActivity extends AppCompatActivity {
 
     private static final int NEW_CONTACT_ACTIVITY_REQUEST_CODE = 1;
 
-    private static final String TAG = "NEW_CONTACT_TAG";
-
-    private static final int WRITE_CONTACT_PERMISSION_CODE = 100;
-
     private static final int IMAGE_PICK_GALLERY_CODE = 200;
-
-    private String[] contactPermissions;
 
     private Uri imageUri;
 
@@ -55,7 +49,7 @@ public class NewContactActivity extends AppCompatActivity {
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu, menu);
+        getMenuInflater().inflate(R.menu.new_contact_menu, menu);
         return true;
     }
 
