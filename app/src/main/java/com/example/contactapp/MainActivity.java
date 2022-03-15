@@ -85,19 +85,6 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()) {
-            case R.id.action_search:
-                onClickBtnSearch();
-            default:break;
-        }
-        return true;
-    }
-
-    private void onClickBtnSearch() {
-    }
-
     private void openAddNewContactFormIntent() {
         Intent intent = new Intent(MainActivity.this, NewContactActivity.class);
         startActivityForResult(intent, NEW_CONTACT_ACTIVITY_REQUEST_CODE);
