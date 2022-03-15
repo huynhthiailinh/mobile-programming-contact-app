@@ -10,11 +10,12 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.ViewHolder> {
-    private ArrayList<Contact> contacts;
+    private List<Contact> contacts = new ArrayList<>();
 
-    public ContactsAdapter(ArrayList<Contact> contacts) {
+    public ContactsAdapter(List<Contact> contacts) {
         this.contacts = contacts;
     }
 
@@ -33,7 +34,7 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.ViewHo
 
     @Override
     public int getItemCount() {
-        return 0;
+        return contacts.size();
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
