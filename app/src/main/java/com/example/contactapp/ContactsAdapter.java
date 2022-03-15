@@ -1,5 +1,6 @@
 package com.example.contactapp;
 
+import android.net.Uri;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +11,8 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +36,10 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        Glide
+                .with(holder.ivAvatar.getContext())
+                .load(Uri.parse(contacts.get(position).getAvatarUri()))
+                .into(holder.ivAvatar);
         holder.tvName.setText(contacts.get(position).getName());
     }
 

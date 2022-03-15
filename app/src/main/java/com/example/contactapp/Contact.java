@@ -10,6 +10,9 @@ public class Contact {
     private int id;
 
     @ColumnInfo
+    private String avatarUri;
+
+    @ColumnInfo
     private String name;
 
     @ColumnInfo
@@ -18,7 +21,8 @@ public class Contact {
     @ColumnInfo
     private String email;
 
-    public Contact(String name, String mobile, String email) {
+    public Contact(String avatarUri, String name, String mobile, String email) {
+        this.avatarUri = avatarUri;
         this.name = name;
         this.mobile = mobile;
         this.email = email;
@@ -30,6 +34,14 @@ public class Contact {
 
     public void setId(int id) {
         this.id = id;
+    }
+
+    public String getAvatarUri() {
+        return avatarUri;
+    }
+
+    public void setAvatarUri(String avatarUri) {
+        this.avatarUri = avatarUri;
     }
 
     public String getName() {

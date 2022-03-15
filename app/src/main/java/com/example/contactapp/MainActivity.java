@@ -107,11 +107,12 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
 
         if (requestCode == NEW_CONTACT_ACTIVITY_REQUEST_CODE) {
+            String avatarUri = data.getStringExtra("avatarUri");
             String name = data.getStringExtra("name");
             String phone = data.getStringExtra("phone");
             String email = data.getStringExtra("email");
 
-            Contact c = new Contact(name, phone, email);
+            Contact c = new Contact(avatarUri, name, phone, email);
             contactDao.insertAll(c);
 
             contacts = contactDao.getAllContacts();

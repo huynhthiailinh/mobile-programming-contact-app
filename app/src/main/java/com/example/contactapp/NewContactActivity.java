@@ -68,13 +68,19 @@ public class NewContactActivity extends AppCompatActivity {
     }
 
     private void onClickBtnSave() {
-        String name = binding.etFirstName.getText().toString() + " " + binding.etLastName.getText().toString();
-        String phone = binding.etPhone.getText().toString();
-        String email = binding.etEmail.getText().toString();
         Intent intent = new Intent();
+
+        intent.putExtra("avatarUri", imageUri.toString());
+
+        String name = binding.etFirstName.getText().toString() + " " + binding.etLastName.getText().toString();
         intent.putExtra("name", name);
+
+        String phone = binding.etPhone.getText().toString();
         intent.putExtra("phone", phone);
+
+        String email = binding.etEmail.getText().toString();
         intent.putExtra("email", email);
+
         setResult(NEW_CONTACT_ACTIVITY_REQUEST_CODE, intent);
         finish();
     }
