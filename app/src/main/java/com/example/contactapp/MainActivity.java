@@ -3,6 +3,7 @@ package com.example.contactapp;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 
+import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.View;
@@ -41,5 +42,17 @@ public class MainActivity extends AppCompatActivity {
         contactsAdapter = new ContactsAdapter(contacts);
         binding.rvContacts.setAdapter(contactsAdapter);
         binding.rvContacts.setLayoutManager(new LinearLayoutManager(this));
+
+        binding.btnAdd.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                openAddNewContactFormIntent();
+            }
+        });
+    }
+
+    private void openAddNewContactFormIntent() {
+        Intent intent = new Intent(MainActivity.this, NewContactActivity.class);
+        startActivity(intent);
     }
 }
