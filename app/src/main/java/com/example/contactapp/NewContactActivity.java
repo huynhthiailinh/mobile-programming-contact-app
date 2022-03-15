@@ -1,13 +1,18 @@
 package com.example.contactapp;
 
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.contactapp.databinding.NewContactActivityBinding;
@@ -32,12 +37,41 @@ public class NewContactActivity extends AppCompatActivity {
         View viewRoot = binding.getRoot();
         setContentView(viewRoot);
 
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setTitle("Create new contact");
+        Drawable drawable= getResources().getDrawable(R.drawable.ic_baseline_close_24);
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setHomeAsUpIndicator(drawable);
+
         binding.ivAvatar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 openGalleryIntent();
             }
         });
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+
+            case R.id.btn_save:
+                onClickBtnSave();
+            default:break;
+        }
+        return true;
+    }
+
+    private void onClickBtnSave() {
     }
 
     private void openGalleryIntent() {
