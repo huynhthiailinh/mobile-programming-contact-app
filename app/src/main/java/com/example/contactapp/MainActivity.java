@@ -13,6 +13,8 @@ import com.example.contactapp.databinding.ActivityMainBinding;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
+    private static final int NEW_CONTACT_ACTIVITY_REQUEST_CODE = 1;
+
     private ActivityMainBinding binding;
     private List<Contact> contacts;
     private ContactsAdapter contactsAdapter;
@@ -53,6 +55,24 @@ public class MainActivity extends AppCompatActivity {
 
     private void openAddNewContactFormIntent() {
         Intent intent = new Intent(MainActivity.this, NewContactActivity.class);
-        startActivity(intent);
+        startActivityForResult(intent, NEW_CONTACT_ACTIVITY_REQUEST_CODE);
+    }
+
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == NEW_CONTACT_ACTIVITY_REQUEST_CODE) {
+            String name = data.getStringExtra("name");
+            String phone = data.getStringExtra("phone");
+            String email = data.getStringExtra("email");
+
+            Contact c = new Contact(name, phone, email);
+            contactDao.insertAll(c);
+
+            contacts = contactDao.getAllContacts();
+            contactsAdapter = new ContactsAdapter(contacts);
+            binding.rvContacts.setAdapter(contactsAdapter);
+            binding.rvContacts.setLayoutManager(new LinearLayoutManager(this));
+        }
     }
 }
