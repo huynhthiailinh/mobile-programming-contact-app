@@ -23,7 +23,18 @@ public class Contact implements Serializable {
     @ColumnInfo
     private String email;
 
+    public Contact() {
+    }
+
     public Contact(String avatarUri, String name, String mobile, String email) {
+        this.avatarUri = avatarUri;
+        this.name = name;
+        this.mobile = mobile;
+        this.email = email;
+    }
+
+    public Contact(int id, String avatarUri, String name, String mobile, String email) {
+        this.id = id;
         this.avatarUri = avatarUri;
         this.name = name;
         this.mobile = mobile;

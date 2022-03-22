@@ -47,6 +47,7 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.ViewHo
                 .load(Uri.parse(contacts.get(position).getAvatarUri()))
                 .into(holder.ivAvatar);
         holder.tvName.setText(contacts.get(position).getName());
+
         holder.cvItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

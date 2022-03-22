@@ -19,9 +19,8 @@ import com.example.contactapp.databinding.ActivityMainBinding;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-    private static final int NEW_CONTACT_ACTIVITY_REQUEST_CODE = 1;
-
     private ActivityMainBinding binding;
+    private static final int NEW_EDIT_CONTACT_ACTIVITY_REQUEST_CODE = 1;
     private List<Contact> contacts;
     private ContactsAdapter contactsAdapter;
 
@@ -57,13 +56,6 @@ public class MainActivity extends AppCompatActivity {
         RecyclerView.ItemDecoration itemDecoration = new DividerItemDecoration(this, DividerItemDecoration.VERTICAL);
         binding.rvContacts.addItemDecoration(itemDecoration);
 
-        binding.rvContacts.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-            }
-        });
-
         binding.btnAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -97,20 +89,21 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void openAddNewContactFormIntent() {
-        Intent intent = new Intent(MainActivity.this, AddContactActivity.class);
-        startActivityForResult(intent, NEW_CONTACT_ACTIVITY_REQUEST_CODE);
+        Intent intent = new Intent(MainActivity.this, AddEditContactActivity.class);
+        intent.putExtra("is_edit_mode", false);
+        startActivityForResult(intent, NEW_EDIT_CONTACT_ACTIVITY_REQUEST_CODE);
     }
 
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
 
-        if (requestCode == NEW_CONTACT_ACTIVITY_REQUEST_CODE) {
+        if (requestCode == NEW_EDIT_CONTACT_ACTIVITY_REQUEST_CODE) {
             String avatarUri = data.getStringExtra("avatarUri");
             String name = data.getStringExtra("name");
-            String phone = data.getStringExtra("phone");
+            String mobile = data.getStringExtra("mobile");
             String email = data.getStringExtra("email");
 
-            Contact c = new Contact(avatarUri, name, phone, email);
+            Contact c = new Contact(avatarUri, name, mobile, email);
             contactDao.insertAll(c);
 
             contacts = contactDao.getAllContacts();
