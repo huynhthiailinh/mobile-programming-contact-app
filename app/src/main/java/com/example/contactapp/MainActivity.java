@@ -1,5 +1,6 @@
 package com.example.contactapp;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
@@ -19,9 +20,9 @@ import com.example.contactapp.databinding.ActivityMainBinding;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
-    private static final int NEW_CONTACT_ACTIVITY_REQUEST_CODE = 1;
-
     private ActivityMainBinding binding;
+    private static final int NEW_EDIT_CONTACT_ACTIVITY_REQUEST_CODE = 1;
+    private static final int DETAIL_CONTACT_ACTIVITY_REQUEST_CODE = 2;
     private List<Contact> contacts;
     private ContactsAdapter contactsAdapter;
 
@@ -49,20 +50,10 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
-        contacts = contactDao.getAllContacts();
-        contactsAdapter = new ContactsAdapter(this, contacts);
-        binding.rvContacts.setAdapter(contactsAdapter);
-        binding.rvContacts.setLayoutManager(new LinearLayoutManager(this));
+        loadData();
 
         RecyclerView.ItemDecoration itemDecoration = new DividerItemDecoration(this, DividerItemDecoration.VERTICAL);
         binding.rvContacts.addItemDecoration(itemDecoration);
-
-        binding.rvContacts.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-
-            }
-        });
 
         binding.btnAdd.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -70,6 +61,22 @@ public class MainActivity extends AppCompatActivity {
                 openAddNewContactFormIntent();
             }
         });
+    }
+
+    private void loadData() {
+        contacts = contactDao.getAllContacts();
+        contactsAdapter = new ContactsAdapter(contacts, new ContactsAdapter.ItemClickListener() {
+            @Override
+            public void onItemClick(Contact contact) {
+                Intent intent = new Intent(MainActivity.this, DetailContactActivity.class);
+                Bundle bundle = new Bundle();
+                bundle.putSerializable("object_contact", contact);
+                intent.putExtras(bundle);
+                startActivityForResult(intent, DETAIL_CONTACT_ACTIVITY_REQUEST_CODE);
+            }
+        });
+        binding.rvContacts.setAdapter(contactsAdapter);
+        binding.rvContacts.setLayoutManager(new LinearLayoutManager(this));
     }
 
     @Override
@@ -97,26 +104,18 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void openAddNewContactFormIntent() {
-        Intent intent = new Intent(MainActivity.this, AddContactActivity.class);
-        startActivityForResult(intent, NEW_CONTACT_ACTIVITY_REQUEST_CODE);
+        Intent intent = new Intent(MainActivity.this, AddEditContactActivity.class);
+        intent.putExtra("is_edit_mode", false);
+        startActivityForResult(intent, NEW_EDIT_CONTACT_ACTIVITY_REQUEST_CODE);
     }
 
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
-        if (requestCode == NEW_CONTACT_ACTIVITY_REQUEST_CODE) {
-            String avatarUri = data.getStringExtra("avatarUri");
-            String name = data.getStringExtra("name");
-            String phone = data.getStringExtra("phone");
-            String email = data.getStringExtra("email");
-
-            Contact c = new Contact(avatarUri, name, phone, email);
-            contactDao.insertAll(c);
-
-            contacts = contactDao.getAllContacts();
-            contactsAdapter = new ContactsAdapter(this, contacts);
-            binding.rvContacts.setAdapter(contactsAdapter);
-            binding.rvContacts.setLayoutManager(new LinearLayoutManager(this));
+        if (requestCode == NEW_EDIT_CONTACT_ACTIVITY_REQUEST_CODE || requestCode == DETAIL_CONTACT_ACTIVITY_REQUEST_CODE) {
+            contacts.clear();
+            contacts.addAll(contactDao.getAllContacts());
+            contactsAdapter.notifyDataSetChanged();
         }
     }
 }

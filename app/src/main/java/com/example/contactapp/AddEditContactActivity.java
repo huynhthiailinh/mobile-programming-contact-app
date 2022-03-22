@@ -20,27 +20,70 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.contactapp.databinding.AddContactActivityBinding;
+import com.example.contactapp.databinding.AddEditContactActivityBinding;
 
-public class AddContactActivity extends AppCompatActivity {
-    private AddContactActivityBinding binding;
-    private static final int NEW_CONTACT_ACTIVITY_REQUEST_CODE = 1;
+public class AddEditContactActivity extends AppCompatActivity {
+    private AddEditContactActivityBinding binding;
+    private static final int NEW_EDIT_CONTACT_ACTIVITY_REQUEST_CODE = 1;
 //    image pick constants
     private static final int IMAGE_PICK_CAMERA_CODE = 400;
     private static final int IMAGE_PICK_GALLERY_CODE = 500;
 //    image picked uri
     private Uri imageUri;
+    private boolean isEditMode = false;
+    private Contact contact;
+    private AppDatabase appDatabase;
+    private ContactDao contactDao;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        binding = AddContactActivityBinding.inflate(getLayoutInflater());
+        binding = AddEditContactActivityBinding.inflate(getLayoutInflater());
         View viewRoot = binding.getRoot();
         setContentView(viewRoot);
 
+        Intent intent = getIntent();
+        isEditMode = intent.getBooleanExtra("is_edit_mode", false);
+
+        appDatabase = AppDatabase.getInstance(this);
+        contactDao = appDatabase.contactDao();
+
         ActionBar actionBar = getSupportActionBar();
-        actionBar.setTitle("Create new contact");
-        Drawable drawable= getResources().getDrawable(R.drawable.ic_baseline_close_24);
+
+        if (isEditMode) {
+            actionBar.setTitle("Edit contact");
+
+            Bundle bundle = getIntent().getExtras();
+            if (bundle == null) {
+                return;
+            }
+            contact = (Contact) bundle.get("object_contact");
+
+            if (contact.getAvatarUri().equals("null")) {
+                binding.ivAvatar.setImageResource(R.drawable.ic_baseline_person_24);
+            } else {
+                imageUri = Uri.parse(contact.getAvatarUri());
+
+                String[] filePathColumn = { MediaStore.Images.Media.DATA };
+                Cursor cursor = getContentResolver().query(Uri.parse(contact.getAvatarUri()),
+                        filePathColumn, null, null, null);
+                cursor.moveToFirst();
+                int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+                String picturePath = cursor.getString(columnIndex);
+                cursor.close();
+                binding.ivAvatar.setImageBitmap(BitmapFactory.decodeFile(picturePath));
+            }
+
+            binding.etFirstName.setText(contact.getName().split(" ")[0]);
+            binding.etLastName.setText(contact.getName().split(" ")[1]);
+            binding.etMobile.setText(contact.getMobile());
+            binding.etEmail.setText(contact.getEmail());
+
+        } else {
+            actionBar.setTitle("Create new contact");
+        }
+
+        Drawable drawable = getResources().getDrawable(R.drawable.ic_baseline_close_24);
         actionBar.setDisplayHomeAsUpEnabled(true);
         actionBar.setHomeAsUpIndicator(drawable);
 
@@ -52,21 +95,36 @@ public class AddContactActivity extends AppCompatActivity {
         });
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.add_edit_contact_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                onBackPressed();
+                return true;
+
+            case R.id.btn_save:
+                onClickBtnSave();
+            default:break;
+        }
+        return true;
+    }
+
     private void showImagePickDialog() {
-//        options to display in dialog
         String[] options = {"Camera", "Gallery"};
-//        dialog
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Pick Image")
                 .setItems(options, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-//                        handle clicks
                         if (i == 0) {
-//                            camera clicked
                             pickFromCamera();
                         } else {
-//                            gallery clicked
                             pickFromGallery();
                         }
                     }
@@ -87,46 +145,31 @@ public class AddContactActivity extends AppCompatActivity {
     }
 
     private void pickFromGallery() {
-        Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
+        Intent intent = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         intent.setType("image/*");
         startActivityForResult(intent, IMAGE_PICK_GALLERY_CODE);
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.new_contact_menu, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                onBackPressed();
-                return true;
-
-            case R.id.btn_save:
-                onClickBtnSave();
-            default:break;
-        }
-        return true;
     }
 
     private void onClickBtnSave() {
         Intent intent = new Intent();
 
-        intent.putExtra("avatarUri", imageUri.toString());
-
+        String avatarUri = imageUri.toString();
         String name = binding.etFirstName.getText().toString() + " " + binding.etLastName.getText().toString();
-        intent.putExtra("name", name);
-
-        String phone = binding.etPhone.getText().toString();
-        intent.putExtra("phone", phone);
-
+        String mobile = binding.etMobile.getText().toString();
         String email = binding.etEmail.getText().toString();
-        intent.putExtra("email", email);
 
-        setResult(NEW_CONTACT_ACTIVITY_REQUEST_CODE, intent);
+        if (isEditMode) {
+            Contact c = new Contact(contact.getId(), avatarUri, name, mobile, email);
+            contactDao.updateContact(c);
+            Bundle bundle = new Bundle();
+            bundle.putSerializable("edited_contact", c);
+            intent.putExtras(bundle);
+        } else {
+            Contact c = new Contact(avatarUri, name, mobile, email);
+            contactDao.insertAll(c);
+        }
+
+        setResult(NEW_EDIT_CONTACT_ACTIVITY_REQUEST_CODE, intent);
         finish();
     }
 
