@@ -3,6 +3,8 @@ package com.example.contactapp;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.database.Cursor;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -18,10 +20,10 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.contactapp.databinding.NewContactActivityBinding;
+import com.example.contactapp.databinding.AddContactActivityBinding;
 
-public class NewContactActivity extends AppCompatActivity {
-    private NewContactActivityBinding binding;
+public class AddContactActivity extends AppCompatActivity {
+    private AddContactActivityBinding binding;
     private static final int NEW_CONTACT_ACTIVITY_REQUEST_CODE = 1;
 //    image pick constants
     private static final int IMAGE_PICK_CAMERA_CODE = 400;
@@ -32,7 +34,7 @@ public class NewContactActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        binding = NewContactActivityBinding.inflate(getLayoutInflater());
+        binding = AddContactActivityBinding.inflate(getLayoutInflater());
         View viewRoot = binding.getRoot();
         setContentView(viewRoot);
 
@@ -85,7 +87,7 @@ public class NewContactActivity extends AppCompatActivity {
     }
 
     private void pickFromGallery() {
-        Intent intent = new Intent(Intent.ACTION_PICK);
+        Intent intent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
         intent.setType("image/*");
         startActivityForResult(intent, IMAGE_PICK_GALLERY_CODE);
     }
@@ -137,7 +139,14 @@ public class NewContactActivity extends AppCompatActivity {
                 binding.ivAvatar.setImageURI(imageUri);
             } else if (requestCode == IMAGE_PICK_GALLERY_CODE) {
                 imageUri = data.getData();
-                binding.ivAvatar.setImageURI(imageUri);
+                String[] filePathColumn = { MediaStore.Images.Media.DATA };
+                Cursor cursor = getContentResolver().query(imageUri,
+                        filePathColumn, null, null, null);
+                cursor.moveToFirst();
+                int columnIndex = cursor.getColumnIndex(filePathColumn[0]);
+                String picturePath = cursor.getString(columnIndex);
+                cursor.close();
+                binding.ivAvatar.setImageBitmap(BitmapFactory.decodeFile(picturePath));
             }
         } else {
             Toast.makeText(this, "Cancelled...", Toast.LENGTH_SHORT).show();

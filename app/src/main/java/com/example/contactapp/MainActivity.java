@@ -3,7 +3,9 @@ package com.example.contactapp;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.AsyncTask;
@@ -48,9 +50,19 @@ public class MainActivity extends AppCompatActivity {
         });
 
         contacts = contactDao.getAllContacts();
-        contactsAdapter = new ContactsAdapter(contacts);
+        contactsAdapter = new ContactsAdapter(this, contacts);
         binding.rvContacts.setAdapter(contactsAdapter);
         binding.rvContacts.setLayoutManager(new LinearLayoutManager(this));
+
+        RecyclerView.ItemDecoration itemDecoration = new DividerItemDecoration(this, DividerItemDecoration.VERTICAL);
+        binding.rvContacts.addItemDecoration(itemDecoration);
+
+        binding.rvContacts.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+
+            }
+        });
 
         binding.btnAdd.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -85,7 +97,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void openAddNewContactFormIntent() {
-        Intent intent = new Intent(MainActivity.this, NewContactActivity.class);
+        Intent intent = new Intent(MainActivity.this, AddContactActivity.class);
         startActivityForResult(intent, NEW_CONTACT_ACTIVITY_REQUEST_CODE);
     }
 
@@ -102,7 +114,7 @@ public class MainActivity extends AppCompatActivity {
             contactDao.insertAll(c);
 
             contacts = contactDao.getAllContacts();
-            contactsAdapter = new ContactsAdapter(contacts);
+            contactsAdapter = new ContactsAdapter(this, contacts);
             binding.rvContacts.setAdapter(contactsAdapter);
             binding.rvContacts.setLayoutManager(new LinearLayoutManager(this));
         }
