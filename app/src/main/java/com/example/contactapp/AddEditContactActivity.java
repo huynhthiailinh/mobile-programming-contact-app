@@ -32,6 +32,8 @@ public class AddEditContactActivity extends AppCompatActivity {
     private Uri imageUri;
     private boolean isEditMode = false;
     private Contact contact;
+    private boolean isEditMode = false;
+    private Contact contact;
     private AppDatabase appDatabase;
     private ContactDao contactDao;
 
