@@ -1,5 +1,6 @@
 package com.example.contactapp;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
@@ -10,7 +11,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -108,6 +108,8 @@ public class MainActivity extends AppCompatActivity {
         intent.putExtra("is_edit_mode", false);
         startActivityForResult(intent, NEW_EDIT_CONTACT_ACTIVITY_REQUEST_CODE);
     }
+
+
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
