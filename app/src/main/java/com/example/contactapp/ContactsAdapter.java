@@ -16,6 +16,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.ViewHolder> implements Filterable {
@@ -43,12 +45,30 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+
+//        load avatar
         Glide
                 .with(holder.ivAvatar.getContext())
                 .load(Uri.parse(contacts.get(position).getAvatarUri()))
                 .into(holder.ivAvatar);
+
+//        load initial
+        Collections.sort(contacts, new Comparator<Contact>() {
+            @Override
+            public int compare(Contact contact, Contact t1) {
+                return contact.getName().compareToIgnoreCase(t1.getName());
+            }
+        });
+        if (position != 0 && contacts.get(position).getName().charAt(0) == contacts.get(position-1).getName().charAt(0)) {
+            holder.tvInitial.setVisibility(View.INVISIBLE);
+        } else {
+            holder.tvInitial.setText(Character.toString(contacts.get(position).getName().charAt(0)));
+        }
+
+//        load name
         holder.tvName.setText(contacts.get(position).getName());
 
+//        on click contact item
         holder.cvItem.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -98,12 +118,14 @@ public class ContactsAdapter extends RecyclerView.Adapter<ContactsAdapter.ViewHo
         public CardView cvItem;
         public TextView tvName;
         public ImageView ivAvatar;
+        public TextView tvInitial;
 
         public ViewHolder(View view) {
             super(view);
             cvItem = view.findViewById(R.id.cv_item);
             tvName = view.findViewById(R.id.tv_name);
             ivAvatar = view.findViewById(R.id.iv_avatar);
+            tvInitial = view.findViewById(R.id.tv_initial);
         }
     }
 }

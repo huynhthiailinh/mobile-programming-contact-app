@@ -17,6 +17,8 @@ import android.view.View;
 
 import com.example.contactapp.databinding.ActivityMainBinding;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -65,6 +67,12 @@ public class MainActivity extends AppCompatActivity {
 
     private void loadData() {
         contacts = contactDao.getAllContacts();
+        Collections.sort(contacts, new Comparator<Contact>() {
+            @Override
+            public int compare(Contact contact, Contact t1) {
+                return contact.getName().compareToIgnoreCase(t1.getName());
+            }
+        });
         contactsAdapter = new ContactsAdapter(contacts, new ContactsAdapter.ItemClickListener() {
             @Override
             public void onItemClick(Contact contact) {
@@ -116,8 +124,7 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == NEW_EDIT_CONTACT_ACTIVITY_REQUEST_CODE || requestCode == DETAIL_CONTACT_ACTIVITY_REQUEST_CODE) {
             contacts.clear();
-            contacts.addAll(contactDao.getAllContacts());
-            contactsAdapter.notifyDataSetChanged();
+            loadData();
         }
     }
 }
